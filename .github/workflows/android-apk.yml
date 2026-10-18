@@ -76,6 +76,18 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+      - name: Publish direct APK download
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          APK=build/app/outputs/flutter-apk/app-release.apk
+          if gh release view latest >/dev/null 2>&1; then
+            gh release upload latest "${APK}#LuminaPlan.apk" --clobber
+          else
+            gh release create latest "${APK}#LuminaPlan.apk" --title "LuminaPlan Android" --notes "APK do LuminaPlan: agenda, lancamentos financeiros e alertas. Versao inicial de testes." --latest
+          fi
+
       - name: Publish unpacked Flutter sources
         if: success()
         run: |
